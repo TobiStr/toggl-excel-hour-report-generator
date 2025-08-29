@@ -88,7 +88,8 @@ public class ReportService : IReportService
             ProjectName = filterName,
             StartDate = request.StartDate,
             EndDate = request.EndDate,
-            TotalHours = totalHours
+            TotalHours = totalHours,
+            HourlyRate = request.HourlyRate
         };
     }
 }

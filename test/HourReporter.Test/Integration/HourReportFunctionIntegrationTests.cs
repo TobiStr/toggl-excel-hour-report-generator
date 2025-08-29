@@ -64,6 +64,7 @@ public class HourReportFunctionIntegrationTests : IDisposable
             StartDate = DateTime.Parse("2025-08-01"),
             EndDate = DateTime.Parse("2025-08-29"),
             ProjectName = "Test",
+            HourlyRate = 80
         };
 
         var requestJson = JsonSerializer.Serialize(

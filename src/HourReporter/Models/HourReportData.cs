@@ -7,6 +7,7 @@ public class HourReportData
     public DateTime StartDate { get; set; }
     public DateTime EndDate { get; set; }
     public double TotalHours { get; set; }
+    public decimal? HourlyRate { get; set; }
 
     public string GetFileName()
     {

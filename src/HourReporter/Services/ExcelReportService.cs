@@ -97,7 +97,7 @@ public class ExcelReportService : IExcelReportService
 
         // Set minimum column widths
         worksheet.Column(1).Width = Math.Max(worksheet.Column(1).Width, 12); // Date
-        worksheet.Column(2).Width = Math.Max(worksheet.Column(2).Width, 15); // Project
+        worksheet.Column(2).Width = 30; // Project
         worksheet.Column(3).Width = Math.Max(worksheet.Column(3).Width, 30); // Description
         worksheet.Column(4).Width = Math.Max(worksheet.Column(4).Width, 12); // Duration
         worksheet.Column(5).Width = Math.Max(worksheet.Column(5).Width, 15); // Tags
@@ -137,8 +137,25 @@ public class ExcelReportService : IExcelReportService
         worksheet.Cell(summaryRow + 4, 1).Value = "Total Entries:";
         worksheet.Cell(summaryRow + 4, 2).Value = reportData.Rows.Count;
 
+        var summaryEndRow = summaryRow + 4;
+
+        if (reportData.HourlyRate.HasValue)
+        {
+            worksheet.Cell(summaryRow + 5, 1).Value = "Hourly Rate:";
+            worksheet.Cell(summaryRow + 5, 2).Value = $"€ {reportData.HourlyRate.Value:F2}";
+
+            worksheet.Cell(summaryRow + 6, 1).Value = "Total Sum:";
+            var totalSumCell = worksheet.Cell(summaryRow + 6, 2);
+            var totalSum = (decimal)reportData.TotalHours * reportData.HourlyRate.Value;
+            totalSumCell.Value = $"€ {totalSum:F2}";
+            totalSumCell.Style.Font.Bold = true;
+            totalSumCell.Style.Fill.BackgroundColor = XLColor.LightGreen;
+
+            summaryEndRow = summaryRow + 6;
+        }
+
         // Format summary section
-        var summaryRange = worksheet.Range(summaryRow, 1, summaryRow + 4, 2);
+        var summaryRange = worksheet.Range(summaryRow, 1, summaryEndRow, 2);
         summaryRange.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
         summaryRange.Style.Border.InsideBorder = XLBorderStyleValues.Thin;
 
