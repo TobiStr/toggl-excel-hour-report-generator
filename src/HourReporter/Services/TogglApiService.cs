@@ -51,7 +51,7 @@ public class TogglApiService : ITogglApiService
                 endDate
             );
 
-            var timeEntries = await GetTimeEntriesForWorkspaceAsync(
+            var timeEntries = await GetTimeEntriesAsync(
                 startDate,
                 endDate,
                 cancellationToken
@@ -72,17 +72,17 @@ public class TogglApiService : ITogglApiService
         }
     }
 
-    private async Task<List<TimeEntry>> GetTimeEntriesForWorkspaceAsync(
+    private async Task<List<TimeEntry>> GetTimeEntriesAsync(
         DateTime startDate,
         DateTime endDate,
         CancellationToken cancellationToken
     )
     {
-        var startDateString = startDate.ToString("yyyy-MM-dd");
-        var endDateString = endDate.ToString("yyyy-MM-dd");
+        var startDateString = startDate.ToString("o");
+        var endDateString = endDate.AddDays(1).AddSeconds(-1).ToString("o");
 
         var url =
-            $"{BaseUrl}/me/time_entries?start_date={startDateString}&end_date={endDateString}&meta=true&include_sharing=true";
+            $"{BaseUrl}/me/time_entries?start_date={startDateString}Z&end_date={endDateString}Z&meta=true&include_sharing=true";
 
         var response = await _httpClient.GetAsync(url, cancellationToken);
         response.EnsureSuccessStatusCode();
