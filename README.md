@@ -45,29 +45,10 @@ Add your Toggl API token to the application settings:
 {
   "startDate": "2024-01-01",
   "endDate": "2024-01-31",
-  "projectName": "Project Name"
-}
-```
-
-#### Request Examples
-
-**Filter by Client:**
-
-```json
-{
-  "startDate": "2024-01-01",
-  "endDate": "2024-01-31",
-  "projectName": "Acme Corp"
-}
-```
-
-**Filter by Project:**
-
-```json
-{
-  "startDate": "2024-01-01",
-  "endDate": "2024-01-31",
-  "projectName": "Website Redesign"
+  "projectName": "Project Name", // This is the filter for Toggl project
+  "contractorName": "Tobias", // Will be mentioned in the report as Contractor
+  "hourlyRate": 80, // To calculate the total revenue
+  "timeOffset": 2 // To counter azure's local date time
 }
 ```
 
