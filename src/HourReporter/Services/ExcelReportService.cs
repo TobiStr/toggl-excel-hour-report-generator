@@ -129,29 +129,41 @@ public class ExcelReportService : IExcelReportService
         worksheet.Cell(summaryRow + 2, 1).Value = "Project:";
         worksheet.Cell(summaryRow + 2, 2).Value = reportData.ProjectName;
 
-        worksheet.Cell(summaryRow + 3, 1).Value = "Total Hours:";
-        var totalHoursCell = worksheet.Cell(summaryRow + 3, 2);
+        var nextRow = summaryRow + 3;
+        if (!string.IsNullOrEmpty(reportData.ContractorName))
+        {
+            worksheet.Cell(nextRow, 1).Value = "Contractor:";
+            worksheet.Cell(nextRow, 2).Value = reportData.ContractorName;
+            nextRow++;
+        }
+
+        worksheet.Cell(nextRow, 1).Value = "Total Hours:";
+        var totalHoursCell = worksheet.Cell(nextRow, 2);
         totalHoursCell.Value = Math.Round(reportData.TotalHours, 2);
         totalHoursCell.Style.Font.Bold = true;
+        nextRow++;
 
-        worksheet.Cell(summaryRow + 4, 1).Value = "Total Entries:";
-        worksheet.Cell(summaryRow + 4, 2).Value = reportData.Rows.Count;
+        worksheet.Cell(nextRow, 1).Value = "Total Entries:";
+        worksheet.Cell(nextRow, 2).Value = reportData.Rows.Count;
+        nextRow++;
 
-        var summaryEndRow = summaryRow + 4;
+        var summaryEndRow = nextRow - 1;
 
         if (reportData.HourlyRate.HasValue)
         {
-            worksheet.Cell(summaryRow + 5, 1).Value = "Hourly Rate:";
-            worksheet.Cell(summaryRow + 5, 2).Value = $"€ {reportData.HourlyRate.Value:F2}";
+            worksheet.Cell(nextRow, 1).Value = "Hourly Rate:";
+            worksheet.Cell(nextRow, 2).Value = $"€ {reportData.HourlyRate.Value:F2}";
+            nextRow++;
 
-            worksheet.Cell(summaryRow + 6, 1).Value = "Total Sum:";
-            var totalSumCell = worksheet.Cell(summaryRow + 6, 2);
+            worksheet.Cell(nextRow, 1).Value = "Total Sum:";
+            var totalSumCell = worksheet.Cell(nextRow, 2);
             var totalSum = (decimal)reportData.TotalHours * reportData.HourlyRate.Value;
             totalSumCell.Value = $"€ {totalSum:F2}";
             totalSumCell.Style.Font.Bold = true;
             totalSumCell.Style.Fill.BackgroundColor = XLColor.LightGreen;
+            nextRow++;
 
-            summaryEndRow = summaryRow + 6;
+            summaryEndRow = nextRow - 1;
         }
 
         // Format summary section
@@ -161,4 +173,5 @@ public class ExcelReportService : IExcelReportService
 
         return Task.CompletedTask;
     }
+
 }

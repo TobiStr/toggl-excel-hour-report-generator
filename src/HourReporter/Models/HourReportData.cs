@@ -4,6 +4,7 @@ public class HourReportData
 {
     public List<HourReportRow> Rows { get; set; } = new();
     public string ProjectName { get; set; } = string.Empty;
+    public string? ContractorName { get; set; }
     public DateTime StartDate { get; set; }
     public DateTime EndDate { get; set; }
     public double TotalHours { get; set; }

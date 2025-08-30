@@ -12,19 +12,26 @@ public class ReportService : IReportService
     public ReportService(
         ITogglApiService togglApiService,
         IExcelReportService excelReportService,
-        ILogger<ReportService> logger)
+        ILogger<ReportService> logger
+    )
     {
         _togglApiService = togglApiService;
         _excelReportService = excelReportService;
         _logger = logger;
     }
 
-    public async Task<(byte[] ExcelData, string FileName)> GenerateHourReportAsync(ReportRequest request, CancellationToken cancellationToken = default)
+    public async Task<(byte[] ExcelData, string FileName)> GenerateHourReportAsync(
+        ReportRequest request,
+        CancellationToken cancellationToken = default
+    )
     {
         try
         {
-            _logger.LogInformation("Starting report generation for period {StartDate} to {EndDate}",
-                request.StartDate, request.EndDate);
+            _logger.LogInformation(
+                "Starting report generation for period {StartDate} to {EndDate}",
+                request.StartDate,
+                request.EndDate
+            );
 
             if (!request.IsValid())
             {
@@ -36,7 +43,8 @@ public class ReportService : IReportService
                 request.StartDate,
                 request.EndDate,
                 request.ProjectName,
-                cancellationToken);
+                cancellationToken
+            );
 
             if (timeEntries.Length == 0)
             {
@@ -47,11 +55,18 @@ public class ReportService : IReportService
             var reportData = TransformTimeEntriesToReportData(timeEntries, request);
 
             // Generate Excel file
-            var excelData = await _excelReportService.GenerateReportAsync(reportData, cancellationToken);
+            var excelData = await _excelReportService.GenerateReportAsync(
+                reportData,
+                cancellationToken
+            );
             var fileName = reportData.GetFileName();
 
-            _logger.LogInformation("Report generated successfully. File: {FileName}, Rows: {RowCount}, Total Hours: {TotalHours}",
-                fileName, reportData.Rows.Count, reportData.TotalHours);
+            _logger.LogInformation(
+                "Report generated successfully. File: {FileName}, Rows: {RowCount}, Total Hours: {TotalHours}",
+                fileName,
+                reportData.Rows.Count,
+                reportData.TotalHours
+            );
 
             return (excelData, fileName);
         }
@@ -62,7 +77,10 @@ public class ReportService : IReportService
         }
     }
 
-    private static HourReportData TransformTimeEntriesToReportData(TimeEntry[] timeEntries, ReportRequest request)
+    private static HourReportData TransformTimeEntriesToReportData(
+        TimeEntry[] timeEntries,
+        ReportRequest request
+    )
     {
         var reportRows = timeEntries
             .Where(entry => entry.Duration > 0) // Only include completed entries
@@ -73,9 +91,12 @@ public class ReportService : IReportService
                 ProjectName = entry.ProjectName ?? "No Project",
                 Description = entry.Description ?? "No Description",
                 Duration = entry.DurationInHours,
-                Tags = entry.Tags != null && entry.Tags.Length > 0 ? string.Join(", ", entry.Tags) : "",
-                StartTime = entry.Start.TimeOfDay,
-                EndTime = entry.Stop?.TimeOfDay
+                Tags =
+                    entry.Tags != null && entry.Tags.Length > 0
+                        ? string.Join(", ", entry.Tags)
+                        : "",
+                StartTime = entry.Start.AddHours(request.TimeOffset).TimeOfDay,
+                EndTime = entry.Stop?.AddHours(request.TimeOffset).TimeOfDay
             })
             .ToList();
 
@@ -86,6 +107,7 @@ public class ReportService : IReportService
         {
             Rows = reportRows,
             ProjectName = filterName,
+            ContractorName = request.ContractorName,
             StartDate = request.StartDate,
             EndDate = request.EndDate,
             TotalHours = totalHours,
